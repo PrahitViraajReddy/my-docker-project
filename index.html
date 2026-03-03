@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Website</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a08;
+      --fg: #f0ead6;
+      --accent: #c8a96e;
+      --muted: #3a3a32;
+      --mid: #1e1e18;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.35;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 50;
+      border-bottom: 1px solid rgba(200,169,110,0.1);
+      backdrop-filter: blur(8px);
+      background: rgba(10,10,8,0.6);
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2.5rem;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--fg);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      opacity: 0.7;
+      transition: opacity 0.2s, color 0.2s;
+    }
+
+    nav a:hover { opacity: 1; color: var(--accent); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding-top: 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4rem 4rem 4rem 5rem;
+    }
+
+    .eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.2s forwards;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 5vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.4s forwards;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-desc {
+      font-size: 0.85rem;
+      line-height: 1.8;
+      opacity: 0;
+      max-width: 38ch;
+      color: rgba(240,234,214,0.65);
+      animation: fadeUp 0.9s 0.6s forwards;
+      margin-bottom: 3rem;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.8s forwards;
+    }
+
+    .btn {
+      padding: 0.85rem 2rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+    }
+    .btn-primary:hover { background: #d4b87a; transform: translateY(-2px); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid rgba(240,234,214,0.3);
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    .hero-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      opacity: 0;
+      animation: fadeIn 1.2s 0.5s forwards;
+    }
+
+    .orb {
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #c8a96e44, transparent 60%),
+                  radial-gradient(circle at 70% 70%, #2a2a1a, #0a0a08);
+      border: 1px solid rgba(200,169,110,0.2);
+      position: relative;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .orb::after {
+      content: '';
+      position: absolute;
+      inset: 20px;
+      border-radius: 50%;
+      border: 1px solid rgba(200,169,110,0.1);
+    }
+
+    .orb-ring {
+      position: absolute;
+      inset: -40px;
+      border-radius: 50%;
+      border: 1px solid rgba(200,169,110,0.08);
+    }
+
+    /* STATS */
+    .stats {
+      background: var(--mid);
+      padding: 3rem 5rem;
+      display: flex;
+      gap: 4rem;
+      border-top: 1px solid var(--muted);
+      border-bottom: 1px solid var(--muted);
+    }
+
+    .stat { }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.8rem;
+      color: var(--accent);
+      display: block;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      opacity: 0.5;
+    }
+
+    /* FEATURES */
+    .features {
+      padding: 7rem 5rem;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      margin-bottom: 4rem;
+      max-width: 20ch;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+
+    .card {
+      background: var(--mid);
+      padding: 2.5rem;
+      border: 1px solid var(--muted);
+      transition: border-color 0.3s, transform 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s;
+    }
+
+    .card:hover::before { transform: scaleX(1); }
+    .card:hover { border-color: rgba(200,169,110,0.3); transform: translateY(-4px); }
+
+    .card-icon {
+      font-size: 1.8rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .card p {
+      font-size: 0.8rem;
+      line-height: 1.8;
+      opacity: 0.55;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--muted);
+      padding: 2rem 5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    footer p { font-size: 0.7rem; opacity: 0.4; letter-spacing: 0.1em; }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-18px); }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-right { display: none; }
+      .hero-left { padding: 6rem 2rem 4rem; }
+      .stats { flex-wrap: wrap; padding: 2rem; gap: 2rem; }
+      .features { padding: 4rem 2rem; }
+      .grid { grid-template-columns: 1fr; }
+      nav { padding: 1rem 2rem; }
+      nav ul { gap: 1.2rem; }
+      footer { flex-direction: column; gap: 1rem; padding: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">Studio</div>
+    <ul>
+      <li><a href="#features">Work</a></li>
+      <li><a href="#features">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-left">
+      <p class="eyebrow">Est. 2024 &mdash; Digital Studio</p>
+      <h1>Craft that <em>endures</em><br/>beyond trends.</h1>
+      <p class="hero-desc">
+        We design and build digital experiences rooted in intention — where
+        every detail is deliberate and every interaction leaves a mark.
+      </p>
+      <div class="btn-group">
+        <a href="#features" class="btn btn-primary">Explore Work</a>
+        <a href="#contact" class="btn btn-outline">Get in Touch</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="orb">
+        <div class="orb-ring"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-num">120+</span>
+      <span class="stat-label">Projects delivered</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">08</span>
+      <span class="stat-label">Years of craft</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">98%</span>
+      <span class="stat-label">Client satisfaction</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">40+</span>
+      <span class="stat-label">Countries reached</span>
+    </div>
+  </div>
+
+  <section class="features" id="features">
+    <p class="section-label">What we do</p>
+    <h2 class="section-title">A discipline in<br/><em>making things right</em></h2>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-icon">◈</div>
+        <h3>Brand Identity</h3>
+        <p>Marks and systems built to outlast seasons — rooted in meaning, designed for longevity.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⬡</div>
+        <h3>Web Design</h3>
+        <p>Interfaces that balance beauty and utility. Every screen considered. Every state polished.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">◎</div>
+        <h3>Development</h3>
+        <p>Performant, accessible, and maintainable code — the invisible foundation of great product.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer id="contact">
+    <p>© 2024 Studio — All rights reserved</p>
+    <p>hello@studio.design</p>
+  </footer>
+
+</body>
+</html>
